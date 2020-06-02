@@ -1,0 +1,53 @@
+version: '2'
+services:
+  eis-zookeeper:
+    image: confluentinc/cp-zookeeper:4.0.1
+    container_name: eis-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  eis-kafka:
+    image: confluentinc/cp-kafka:4.0.1
+    container_name: eis-kafka
+    hostname: eis-kafka
+    depends_on:
+      - eis-zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: eis-zookeeper:2181
+      KAFKA_CREATE_TOPICS: "message:1:1"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://eis-kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "29092:29092"
+
+  eis-cassandra:
+    image: bitnami/cassandra:latest
+    container_name: eis-cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_PASSWORD=password123
+    ports:
+      - "9042:9042"
+
+  eis-client:
+    image: eis-client:latest
+    container_name: eis-client
+    depends_on:
+      - eis-kafka
+      - eis-cassandra
+    ports:
+      - "8080:8080"
+
+  eis-processor:
+    image: eis-processor:latest
+    container_name: eis-processor
+    depends_on:
+      - eis-kafka
+    ports:
+      - "8081:8081"
