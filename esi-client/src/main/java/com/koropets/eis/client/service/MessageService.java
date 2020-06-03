@@ -1,7 +1,7 @@
 package com.koropets.eis.client.service;
 
-import com.koropets.eis.common.Message;
+import com.koropets.eis.common.Word;
 
 public interface MessageService {
-    Message sendMessage(Message message);
+    Word sendMessage(Word word);
 }

@@ -18,34 +18,34 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: eis-zookeeper:2181
-      KAFKA_CREATE_TOPICS: "message:1:1"
+      KAFKA_CREATE_TOPICS: "word:1:1,sentence:1:1"
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://eis-kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "29092:29092"
 
-  eis-cassandra:
-    image: bitnami/cassandra:latest
-    container_name: eis-cassandra
-    environment:
-      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2
-      - CASSANDRA_PASSWORD_SEEDER=yes
-      - CASSANDRA_PASSWORD=password123
-    ports:
-      - "9042:9042"
+#  eis-cassandra:
+#    image: bitnami/cassandra:latest
+#    container_name: eis-cassandra
+#    environment:
+#      - CASSANDRA_CLUSTER_NAME=eis-cluster
+#      - CASSANDRA_SEEDS=eis-cassandra-node
+#      - CASSANDRA_PASSWORD_SEEDER=yes
+#      - CASSANDRA_PASSWORD=password123
+#    ports:
+#      - "9042:9042"
 
   eis-client:
-    image: eis-client:latest
+    image: dockerklown/eis-client:latest
     container_name: eis-client
     depends_on:
       - eis-kafka
-      - eis-cassandra
+#      - eis-cassandra
     ports:
       - "8080:8080"
 
   eis-processor:
-    image: eis-processor:latest
+    image: dockerklown/eis-processor:latest
     container_name: eis-processor
     depends_on:
       - eis-kafka

@@ -1,2 +1,17 @@
 server:
   port: 8080
+kafka:
+  servers: eis-kafka:29092
+  groupId: METRICS
+  consumer:
+    offsetConfig: earliest
+  topic:
+    word_topic: word
+    sentence_topic: sentence
+spring:
+  data:
+    cassandra:
+      cluster-name: eis-cluster
+      port: 9042
+      contact-points: eis-cassandra
+      keyspace-name: eis-keyspace

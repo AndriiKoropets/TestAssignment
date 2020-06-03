@@ -1,2 +1,10 @@
 server:
   port: 8081
+kafka:
+  servers: eis-kafka:29092
+  groupId: METRICS
+  consumer:
+    offsetConfig: earliest
+  topic:
+    word_topic: word
+    sentence_topic: sentence

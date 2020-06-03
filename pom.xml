@@ -31,6 +31,7 @@
         <maven.surefire.version>3.0.0-M1</maven.surefire.version>
         <swagger2.version>2.9.2</swagger2.version>
         <swagger.ui.version>2.9.2</swagger.ui.version>
+        <spring-data-cassandra.version>3.0.0.RELEASE</spring-data-cassandra.version>
     </properties>
 
     <dependencies>
@@ -52,6 +53,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-cassandra</artifactId>
+                <version>${spring-data-cassandra.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

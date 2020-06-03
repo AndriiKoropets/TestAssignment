@@ -1,9 +1,10 @@
-package com.koropets.eis.client.configuration;
+package com.koropets.eis.processor.configuration;
 
-import com.koropets.eis.client.kafka.ClientKafkaEndpoint;
-import com.koropets.eis.client.kafka.EisClientKafka;
 import com.koropets.eis.common.Sentence;
 import com.koropets.eis.common.Word;
+import com.koropets.eis.processor.service.ProcessorKafkaEndpoint;
+import com.koropets.eis.processor.service.WordProcessor;
+import com.koropets.eis.processor.service.WordProcessorImpl;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -33,8 +34,8 @@ public class KafkaConfig {
     @Value("${kafka.servers}")
     private String bootstrapServer;
 
-    @Value("${kafka.topic.word_topic}")
-    private String wordTopic;
+    @Value("${kafka.topic.sentence_topic}")
+    private String sentenceTopic;
 
     @Value("${kafka.groupId}")
     private String groupId;
@@ -63,36 +64,36 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Word> producerFactory(){
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
-    }
-
-    @Bean
-    public ConsumerFactory<String, Sentence> consumerFactory() {
-        JsonDeserializer<Sentence> objectJsonDeserializer = new JsonDeserializer<>(Sentence.class);
+    public ConsumerFactory<String, Word> consumerFactory() {
+        JsonDeserializer<Word> objectJsonDeserializer = new JsonDeserializer<>(Word.class);
         objectJsonDeserializer.addTrustedPackages("*");
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(), objectJsonDeserializer);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Sentence>> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Sentence> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Word>> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Word> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
 
     @Bean
-    public KafkaTemplate<String, Word> kafkaTemplate(){
+    public ProducerFactory<String, Sentence> producerFactory(){
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Sentence> kafkaTemplate(){
         return new KafkaTemplate<>(producerFactory(), true);
     }
 
     @Bean
-    public EisClientKafka eisClientKafka(KafkaTemplate<String, Word> kafkaTemplate) {
-        return new EisClientKafka(wordTopic, kafkaTemplate);
+    public WordProcessor wordProcessor(KafkaTemplate<String, Sentence> kafkaTemplate) {
+        return new WordProcessorImpl(sentenceTopic, kafkaTemplate);
     }
 
     @Bean
-    public ClientKafkaEndpoint clientKafkaEndpoint() {
-        return new ClientKafkaEndpoint();
+    public ProcessorKafkaEndpoint processorKafkaEndpoint(WordProcessor wordProcessor) {
+        return new ProcessorKafkaEndpoint(wordProcessor);
     }
 }
