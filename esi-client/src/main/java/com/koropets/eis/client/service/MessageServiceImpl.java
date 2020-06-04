@@ -4,7 +4,6 @@ import com.koropets.eis.client.kafka.EisClientKafka;
 import com.koropets.eis.common.Word;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 
 @Slf4j
 @RequiredArgsConstructor

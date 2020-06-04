@@ -2,6 +2,7 @@ package com.koropets.eis.client.configuration;
 
 import com.koropets.eis.client.kafka.ClientKafkaEndpoint;
 import com.koropets.eis.client.kafka.EisClientKafka;
+import com.koropets.eis.client.service.CassandraService;
 import com.koropets.eis.common.Sentence;
 import com.koropets.eis.common.Word;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -92,7 +93,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ClientKafkaEndpoint clientKafkaEndpoint() {
-        return new ClientKafkaEndpoint();
+    public ClientKafkaEndpoint clientKafkaEndpoint(CassandraService cassandraService) {
+        return new ClientKafkaEndpoint(cassandraService);
     }
 }

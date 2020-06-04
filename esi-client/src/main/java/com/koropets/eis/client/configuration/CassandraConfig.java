@@ -1,6 +1,10 @@
 package com.koropets.eis.client.configuration;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.koropets.eis.client.repository.SentenceRepository;
+import com.koropets.eis.client.service.CassandraService;
+import com.koropets.eis.client.service.CassandraServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.SessionFactory;
@@ -19,12 +23,22 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 @EnableCassandraRepositories(basePackages = "com.koropets.eis.client.repository")
 public class CassandraConfig {
 
+    @Value("${spring.data.cassandra.contact-points}")
+    private String contactPoints;
+
+    @Value("${spring.data.cassandra.keyspace-name}")
+    private String keyspace;
+
+    @Value("${spring.data.cassandra.schema-action}")
+    private String schemaAction;
+
+
     @Bean
     public CqlSessionFactoryBean session() {
 
         CqlSessionFactoryBean session = new CqlSessionFactoryBean();
-        session.setContactPoints("localhost");
-        session.setKeyspaceName("mykeyspace");
+        session.setContactPoints(contactPoints);
+        session.setKeyspaceName(keyspace);
 
         return session;
     }
@@ -35,7 +49,7 @@ public class CassandraConfig {
         SessionFactoryFactoryBean sessionFactory = new SessionFactoryFactoryBean();
         sessionFactory.setSession(session);
         sessionFactory.setConverter(converter);
-        sessionFactory.setSchemaAction(SchemaAction.NONE);
+        sessionFactory.setSchemaAction(SchemaAction.valueOf(schemaAction));
 
         return sessionFactory;
     }
@@ -57,5 +71,10 @@ public class CassandraConfig {
     @Bean
     public CassandraOperations cassandraTemplate(SessionFactory sessionFactory, CassandraConverter converter) {
         return new CassandraTemplate(sessionFactory, converter);
+    }
+
+    @Bean
+    public CassandraService cassandraService(SentenceRepository sentenceRepository) {
+        return new CassandraServiceImpl(sentenceRepository);
     }
 }
