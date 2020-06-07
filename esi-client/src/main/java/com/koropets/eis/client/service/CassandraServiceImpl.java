@@ -6,6 +6,8 @@ import com.koropets.eis.common.Sentence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
+
 @Slf4j
 @RequiredArgsConstructor
 public class CassandraServiceImpl implements CassandraService {
@@ -15,7 +17,10 @@ public class CassandraServiceImpl implements CassandraService {
     @Override
     public void saveSentence(Sentence sentence) {
         log.info("Saving sentence to cassandra. Sentence = {}", sentence.getSentence());
-        sentenceRepository.save(SentenceTable.builder().sentence(sentence.getSentence()).build());
+        sentenceRepository.save(SentenceTable.builder()
+                .uuid(UUID.randomUUID().toString())
+                .sentence(sentence.getSentence())
+                .build());
         log.info("Saved sentence to cassandra. Sentence = {}", sentence.getSentence());
     }
 }

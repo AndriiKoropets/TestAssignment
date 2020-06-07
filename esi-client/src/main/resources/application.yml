@@ -13,8 +13,9 @@ spring:
     cassandra:
       cluster-name: eis-cluster
       port: 9042
-      keyspace: sentence
       contact-points: eis-cassandra
-      keyspace-name: eis-keyspace
+      keyspace-name: eis_cassandra
       schema-action: create_if_not_exists
       connect-timeout: 10000ms
+      password: cassandra
+      username: cassandra

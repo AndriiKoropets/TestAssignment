@@ -1,30 +1,22 @@
 package com.koropets.eis.client.configuration;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.koropets.eis.client.repository.SentenceRepository;
-import com.koropets.eis.client.service.CassandraService;
-import com.koropets.eis.client.service.CassandraServiceImpl;
+import com.datastax.driver.core.AuthProvider;
+import com.datastax.driver.core.PlainTextAuthProvider;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.cassandra.SessionFactory;
-import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
+import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
 import org.springframework.data.cassandra.config.SchemaAction;
-import org.springframework.data.cassandra.config.SessionFactoryFactoryBean;
-import org.springframework.data.cassandra.core.CassandraOperations;
-import org.springframework.data.cassandra.core.CassandraTemplate;
-import org.springframework.data.cassandra.core.convert.CassandraConverter;
-import org.springframework.data.cassandra.core.convert.MappingCassandraConverter;
-import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
-import org.springframework.data.cassandra.core.mapping.SimpleUserTypeResolver;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
 @Configuration
 @EnableCassandraRepositories(basePackages = "com.koropets.eis.client.repository")
-public class CassandraConfig {
+public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Value("${spring.data.cassandra.contact-points}")
     private String contactPoints;
+
+    @Value("${spring.data.cassandra.port}")
+    private Integer port;
 
     @Value("${spring.data.cassandra.keyspace-name}")
     private String keyspace;
@@ -32,49 +24,34 @@ public class CassandraConfig {
     @Value("${spring.data.cassandra.schema-action}")
     private String schemaAction;
 
+    @Value("${spring.data.cassandra.password}")
+    private String password;
 
-    @Bean
-    public CqlSessionFactoryBean session() {
+    @Value("${spring.data.cassandra.username}")
+    private String username;
 
-        CqlSessionFactoryBean session = new CqlSessionFactoryBean();
-        session.setContactPoints(contactPoints);
-        session.setKeyspaceName(keyspace);
-
-        return session;
+    @Override
+    protected String getKeyspaceName() {
+        return keyspace;
     }
 
-    @Bean
-    public SessionFactoryFactoryBean sessionFactory(CqlSession session, CassandraConverter converter) {
-
-        SessionFactoryFactoryBean sessionFactory = new SessionFactoryFactoryBean();
-        sessionFactory.setSession(session);
-        sessionFactory.setConverter(converter);
-        sessionFactory.setSchemaAction(SchemaAction.valueOf(schemaAction));
-
-        return sessionFactory;
+    @Override
+    protected String getContactPoints() {
+        return contactPoints;
     }
 
-    @Bean
-    public CassandraMappingContext mappingContext(CqlSession cqlSession) {
-
-        CassandraMappingContext mappingContext = new CassandraMappingContext();
-        mappingContext.setUserTypeResolver(new SimpleUserTypeResolver(cqlSession));
-
-        return mappingContext;
+    @Override
+    protected int getPort() {
+        return port;
     }
 
-    @Bean
-    public CassandraConverter converter(CassandraMappingContext mappingContext) {
-        return new MappingCassandraConverter(mappingContext);
+    @Override
+    public SchemaAction getSchemaAction() {
+        return SchemaAction.valueOf(schemaAction.toUpperCase());
     }
 
-    @Bean
-    public CassandraOperations cassandraTemplate(SessionFactory sessionFactory, CassandraConverter converter) {
-        return new CassandraTemplate(sessionFactory, converter);
-    }
-
-    @Bean
-    public CassandraService cassandraService(SentenceRepository sentenceRepository) {
-        return new CassandraServiceImpl(sentenceRepository);
+    @Override
+    protected AuthProvider getAuthProvider() {
+        return new PlainTextAuthProvider(username, password);
     }
 }

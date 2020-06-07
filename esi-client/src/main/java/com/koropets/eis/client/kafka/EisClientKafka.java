@@ -16,7 +16,7 @@ public class EisClientKafka {
     private final KafkaTemplate<String, Word> kafkaTemplate;
 
     public void sendMessage(final Word msg) {
-        log.info("Sending message to message kafka topic with word: {}", msg.getWord());
+        log.info("Sending message to kafka topic with word: {}", msg.getWord());
         ListenableFuture<SendResult<String, Word>> future = kafkaTemplate.send(wordTopic, msg);
         setKafkaProducerCallback(msg, future);
     }

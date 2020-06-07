@@ -6,14 +6,14 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+@Table("sentence")
 @Data
 @Builder
 public class SentenceTable {
 
     @PrimaryKey
     @Column
-    private final String id;
+    private final String uuid;
     @Column
     private final String sentence;
 }
