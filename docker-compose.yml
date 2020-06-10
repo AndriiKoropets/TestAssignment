@@ -32,25 +32,19 @@ services:
     ports:
       - "9042:9042"
 
-#  cqlsh:
-#    image: cassandra:3.11.6
-#    entrypoint: cqlsh cassandra
-#    volumes:
-#      - ./cassandra/schema.cql:/schema.cql
+  eis-client:
+    image: dockerklown/eis-client:latest
+    container_name: eis-client
+    depends_on:
+      - eis-kafka
+      - eis-cassandra
+    ports:
+      - "8080:8080"
 
-#  eis-client:
-#    image: dockerklown/eis-client:latest
-#    container_name: eis-client
-#    depends_on:
-#      - eis-kafka
-#      - eis-cassandra
-#    ports:
-#      - "8080:8080"
-#
-#  eis-processor:
-#    image: dockerklown/eis-processor:latest
-#    container_name: eis-processor
-#    depends_on:
-#      - eis-kafka
-#    ports:
-#      - "8081:8081"
+  eis-processor:
+    image: dockerklown/eis-processor:latest
+    container_name: eis-processor
+    depends_on:
+      - eis-kafka
+    ports:
+      - "8081:8081"
